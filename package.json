@@ -1,6 +1,11 @@
 {
+  "scripts": {
+    "dev": "now dev",
+    "deploy": "now deploy"
+  },
   "devDependencies": {
-    "@types/node": "^10.12.18"
+    "@types/node": "^10.12.18",
+    "now": "^15.3.0"
   },
   "dependencies": {
     "weekly-summary-typescript": "^0.1.1"
