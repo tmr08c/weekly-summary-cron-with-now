@@ -1,7 +1,8 @@
 {
-    "version": 2,
-    "name": "nodejs-ts",
-    "builds": [
-        { "src": "*.ts", "use": "@now/node" }
-    ]
+  "version": 2,
+  "name": "github-weekly-summary",
+  "builds": [{ "src": "*.ts", "use": "@now/node" }],
+  "env": {
+    "GITHUB_AUTH_TOKEN": "@github-auth-token"
+  }
 }

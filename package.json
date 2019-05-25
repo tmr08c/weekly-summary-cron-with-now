@@ -1,5 +1,8 @@
 {
   "devDependencies": {
     "@types/node": "^10.12.18"
+  },
+  "dependencies": {
+    "weekly-summary-typescript": "^0.1.1"
   }
 }
