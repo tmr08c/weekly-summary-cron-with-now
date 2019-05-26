@@ -3,6 +3,7 @@
   "name": "github-weekly-summary",
   "builds": [{ "src": "*.ts", "use": "@now/node" }],
   "env": {
-    "GITHUB_AUTH_TOKEN": "@github-auth-token"
+    "GITHUB_AUTH_TOKEN": "@github-auth-token",
+    "SENDGRID_API_KEY": "@sendgrid-api-key"
   }
 }
