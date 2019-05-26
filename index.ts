@@ -3,6 +3,7 @@ import { IncomingMessage, ServerResponse } from "http";
 import { fetchRecentlyClosedPullRequests } from "weekly-summary-typescript";
 import * as sgMail from "@sendgrid/mail";
 import { IPullRequestsForRepos } from "weekly-summary-typescript/dist/github";
+import * as marked from "marked";
 
 export default async function(req: IncomingMessage, res: ServerResponse) {
   console.log("Running schedule for generating Weekly Summary");
@@ -25,10 +26,11 @@ export default async function(req: IncomingMessage, res: ServerResponse) {
   const markdownBody = convertPullRequestsToMarkdown(
     recentlyClosedPullRequests
   );
+  const htmlBody = marked(markdownBody);
 
-  await sendEmail({ to: to, body: markdownBody });
+  await sendEmail({ to: to, textBody: markdownBody, htmlBody: htmlBody });
 
-  res.end(markdownBody);
+  res.end(htmlBody);
 }
 
 function convertPullRequestsToMarkdown(
@@ -51,7 +53,15 @@ function convertPullRequestsToMarkdown(
   );
 }
 
-async function sendEmail({ to, body }: { to: string; body: string }) {
+async function sendEmail({
+  to,
+  textBody,
+  htmlBody
+}: {
+  to: string;
+  textBody: string;
+  htmlBody: string;
+}) {
   if (!process.env.SENDGRID_API_KEY || to.length == 0) {
     console.log(
       "SendGrid is not set up, or no `to` addresses specified. " +
@@ -68,7 +78,8 @@ async function sendEmail({ to, body }: { to: string; body: string }) {
     to: to,
     from: "weekly-summary-cron@example.com",
     subject: `Weekly Summary - ${new Date().toDateString()}`,
-    text: body
+    text: textBody,
+    html: htmlBody
   };
 
   const emailResponse = await sgMail.send(email);

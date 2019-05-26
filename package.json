@@ -4,11 +4,13 @@
     "deploy": "now deploy"
   },
   "devDependencies": {
+    "@types/marked": "^0.6.5",
     "@types/node": "^10.12.18",
     "now": "^15.3.0"
   },
   "dependencies": {
     "@sendgrid/mail": "^6.4.0",
+    "marked": "^0.6.2",
     "weekly-summary-typescript": "^0.1.1"
   }
 }
