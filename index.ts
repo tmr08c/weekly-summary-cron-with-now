@@ -8,7 +8,8 @@ export default async function(req: IncomingMessage, res: ServerResponse) {
   console.log("Running schedule for generating Weekly Summary");
 
   const queryData = parse(req.url, true).query;
-  console.log(`Received the following query parameters: ${queryData}`);
+  console.log(`Received the following query parameters: `);
+  console.log(queryData);
 
   let to = queryData.to || "";
   if (Array.isArray(to)) {
