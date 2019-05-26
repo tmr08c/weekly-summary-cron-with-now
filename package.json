@@ -8,6 +8,7 @@
     "now": "^15.3.0"
   },
   "dependencies": {
+    "@sendgrid/mail": "^6.4.0",
     "weekly-summary-typescript": "^0.1.1"
   }
 }
