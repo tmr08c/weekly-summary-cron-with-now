@@ -12,14 +12,22 @@ export default async function(req: IncomingMessage, res: ServerResponse) {
   console.log(`Received the following query parameters: `);
   console.log(queryData);
 
+  let organization = queryData.organization || "";
+  if (organization.length == 0) {
+    res.statusCode = 400;
+    res.end("Must provide 'organization' query parameter.");
+    return;
+  } else if (Array.isArray(organization)) {
+    organization = organization[0];
+  }
+
   let to = queryData.to || "";
   if (Array.isArray(to)) {
     to = to.join(",");
   }
-
   console.log("Requesting Pull Requests");
   const recentlyClosedPullRequests = await fetchRecentlyClosedPullRequests({
-    organization: "roirevolution"
+    organization
   });
 
   console.log("Received Pull Requests. Generating e-mail.");
