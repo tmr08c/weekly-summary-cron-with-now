@@ -2,26 +2,40 @@ import { parse } from "url";
 import { IncomingMessage, ServerResponse } from "http";
 import { fetchRecentlyClosedPullRequests } from "weekly-summary-typescript";
 import * as sgMail from "@sendgrid/mail";
+import { IPullRequestsForRepos } from "weekly-summary-typescript/dist/github";
 
 export default async function(req: IncomingMessage, res: ServerResponse) {
   console.log("Running schedule for generating Weekly Summary");
 
   const queryData = parse(req.url, true).query;
-  console.log(queryData);
+  console.log(`Received the following query parameters: ${queryData}`);
+
   let to = queryData.to || "";
   if (Array.isArray(to)) {
     to = to.join(",");
   }
 
   console.log("Requesting Pull Requests");
-
   const recentlyClosedPullRequests = await fetchRecentlyClosedPullRequests({
     organization: "roirevolution"
   });
 
   console.log("Received Pull Requests. Generating e-mail.");
+  const markdownBody = convertPullRequestsToMarkdown(
+    recentlyClosedPullRequests
+  );
 
-  const emailBody = Object.entries(recentlyClosedPullRequests).reduce(
+  await sendEmail({ to: to, body: markdownBody });
+
+  res.end(markdownBody);
+}
+
+function convertPullRequestsToMarkdown(
+  pullRequests: IPullRequestsForRepos
+): string {
+  console.log("Converting Pull Request limit to Markdown");
+
+  return Object.entries(pullRequests).reduce(
     (emailBody, [repoName, pullRequests]) => {
       emailBody += `# ${repoName}\n\n`;
 
@@ -34,12 +48,6 @@ export default async function(req: IncomingMessage, res: ServerResponse) {
     },
     ""
   );
-
-  console.log("Generated email body");
-
-  const response = await sendEmail({ to: to, body: emailBody });
-
-  res.end(emailBody);
 }
 
 async function sendEmail({ to, body }: { to: string; body: string }) {
