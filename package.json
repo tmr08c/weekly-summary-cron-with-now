@@ -1,12 +1,19 @@
 {
   "scripts": {
     "dev": "now dev",
-    "deploy": "now deploy"
+    "deploy": "now deploy",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage --coverageReporters=text-lcov"
   },
   "devDependencies": {
+    "@types/jest": "^24.0.13",
     "@types/marked": "^0.6.5",
     "@types/node": "^10.12.18",
-    "now": "^15.3.0"
+    "jest": "^24.8.0",
+    "now": "^15.3.0",
+    "ts-jest": "^24.0.2",
+    "typescript": "^3.5.1"
   },
   "dependencies": {
     "@sendgrid/mail": "^6.4.0",
