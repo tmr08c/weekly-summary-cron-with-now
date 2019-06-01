@@ -22,9 +22,11 @@ export default async function(req: IncomingMessage, res: ServerResponse) {
   }
 
   let to = queryData.to || "";
-  if (Array.isArray(to)) {
-    to = to.join(",");
+  if (!Array.isArray(to)) {
+    to = to.split(",");
   }
+  to = to.filter(email => !email.match(new RegExp(/^\s*$/)));
+
   console.log("Requesting Pull Requests");
   const recentlyClosedPullRequests = await fetchRecentlyClosedPullRequests({
     organization
@@ -66,7 +68,7 @@ async function sendEmail({
   textBody,
   htmlBody
 }: {
-  to: string;
+  to: string[];
   textBody: string;
   htmlBody: string;
 }) {
