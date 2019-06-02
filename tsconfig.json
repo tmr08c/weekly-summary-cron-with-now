@@ -2,7 +2,8 @@
   "compilerOptions": {
     "moduleResolution": "node",
     "target": "es2017",
-    "outDir": "dist"
+    "outDir": "dist",
+    "module": "commonjs"
   },
   "exclude": ["node_modules"]
 }

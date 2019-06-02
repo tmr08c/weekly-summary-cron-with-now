@@ -1,18 +1,17 @@
 import index from "./index";
-import { request, createServer } from "http";
+import { createServer } from "http";
 import listen = require("test-listen");
+import * as request from "request-promise-native";
+import { RequestError } from "request-promise-native/errors";
 
-test("jest is setup", async () => {
-  // const server = createServer((req, res) => res.end(1));
-  // let url = await listen(server);
-  const srv = createServer((req, res) => res.end("1"));
-  let url = await listen(srv);
+test("requests fail if 'organization' is not provided", async () => {
+  const server = createServer(index);
+  const url = await listen(server);
 
-  await request(url, res => {
-    console.log(res);
-
-    expect(res.statusCode).toBe(200);
+  await request(url).catch((error: RequestError) => {
+    expect(error.response.statusCode).toEqual(400);
+    expect(error.message).toMatch(new RegExp(/provide.*organization/));
   });
 
-  expect(true).toBeTruthy();
+  server.close();
 });
