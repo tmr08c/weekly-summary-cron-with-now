@@ -5,7 +5,11 @@ import * as sgMail from "@sendgrid/mail";
 import { IPullRequestsForRepos } from "weekly-summary-typescript/dist/github";
 import * as marked from "marked";
 
-export default async function(req: IncomingMessage, res: ServerResponse) {
+export default async function(
+  req: IncomingMessage,
+  res: ServerResponse,
+  pullRequestFetcher = fetchRecentlyClosedPullRequests
+) {
   console.log("Running schedule for generating Weekly Summary");
 
   const queryData = parse(req.url, true).query;
@@ -26,9 +30,16 @@ export default async function(req: IncomingMessage, res: ServerResponse) {
     to = to.join(",");
   }
   console.log("Requesting Pull Requests");
-  const recentlyClosedPullRequests = await fetchRecentlyClosedPullRequests({
-    organization
-  });
+  let recentlyClosedPullRequests: IPullRequestsForRepos;
+  try {
+    recentlyClosedPullRequests = await pullRequestFetcher({
+      organization
+    });
+  } catch (e) {
+    res.statusCode = 400;
+    res.end(`Failed to fetch pull requests. Received: ${e}`);
+    return;
+  }
 
   console.log("Received Pull Requests. Generating e-mail.");
   const markdownBody = convertPullRequestsToMarkdown(
