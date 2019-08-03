@@ -1,9 +1,9 @@
 import { parse } from "url";
 import { IncomingMessage, ServerResponse } from "http";
 import { fetchRecentlyClosedPullRequests } from "weekly-summary-typescript";
-import * as sgMail from "@sendgrid/mail";
+import sgMail from "@sendgrid/mail";
 import { IPullRequestsForRepos } from "weekly-summary-typescript/dist/github";
-import * as marked from "marked";
+import marked from "marked";
 
 export default async function(
   req: IncomingMessage,

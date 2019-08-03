@@ -1,7 +1,7 @@
 import index from "./index";
 import { createServer, IncomingMessage, ServerResponse } from "http";
-import listen = require("test-listen");
-import * as request from "request-promise-native";
+import listen from "test-listen";
+import request from "request-promise-native";
 import { RequestError } from "request-promise-native/errors";
 import { createRequest, createResponse, MockResponse } from "node-mocks-http";
 import { IPullRequestsForRepos } from "weekly-summary-typescript/dist/github";
