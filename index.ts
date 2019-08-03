@@ -8,7 +8,8 @@ import * as marked from "marked";
 export default async function(
   req: IncomingMessage,
   res: ServerResponse,
-  pullRequestFetcher = fetchRecentlyClosedPullRequests
+  pullRequestFetcher = fetchRecentlyClosedPullRequests,
+  emailer = sgMail
 ) {
   console.log("Running schedule for generating Weekly Summary");
 
@@ -47,7 +48,12 @@ export default async function(
   );
   const htmlBody = marked(markdownBody);
 
-  await sendEmail({ to: to, textBody: markdownBody, htmlBody: htmlBody });
+  await sendEmail({
+    to: to,
+    textBody: markdownBody,
+    htmlBody: htmlBody,
+    emailer: emailer
+  });
 
   res.end(htmlBody);
 }
@@ -75,11 +81,14 @@ function convertPullRequestsToMarkdown(
 async function sendEmail({
   to,
   textBody,
-  htmlBody
+  htmlBody,
+  emailer
 }: {
   to: string;
   textBody: string;
   htmlBody: string;
+  // @sengrid/mail did not export the `MailService` type, but that's what this should be
+  emailer: any;
 }) {
   if (!process.env.SENDGRID_API_KEY || to.length == 0) {
     console.log(
@@ -91,7 +100,7 @@ async function sendEmail({
 
   console.log("Sending email");
 
-  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+  emailer.setApiKey(process.env.SENDGRID_API_KEY);
 
   const email = {
     to: to,
@@ -101,7 +110,7 @@ async function sendEmail({
     html: htmlBody
   };
 
-  const emailResponse = await sgMail.send(email);
+  const emailResponse = await emailer.send(email);
 
   console.log(`Sent email. Response: `);
   console.log(emailResponse);
