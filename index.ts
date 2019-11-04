@@ -1,11 +1,16 @@
 import { parse } from "url";
 import { IncomingMessage, ServerResponse } from "http";
 import { fetchRecentlyClosedPullRequests } from "weekly-summary-typescript";
-import * as sgMail from "@sendgrid/mail";
+import sgMail from "@sendgrid/mail";
 import { IPullRequestsForRepos } from "weekly-summary-typescript/dist/github";
-import * as marked from "marked";
+import marked from "marked";
 
-export default async function(req: IncomingMessage, res: ServerResponse) {
+export default async function(
+  req: IncomingMessage,
+  res: ServerResponse,
+  pullRequestFetcher = fetchRecentlyClosedPullRequests,
+  emailer = sgMail
+) {
   console.log("Running schedule for generating Weekly Summary");
 
   const queryData = parse(req.url, true).query;
@@ -28,9 +33,16 @@ export default async function(req: IncomingMessage, res: ServerResponse) {
   to = to.filter(email => !email.match(new RegExp(/^\s*$/)));
 
   console.log("Requesting Pull Requests");
-  const recentlyClosedPullRequests = await fetchRecentlyClosedPullRequests({
-    organization
-  });
+  let recentlyClosedPullRequests: IPullRequestsForRepos;
+  try {
+    recentlyClosedPullRequests = await pullRequestFetcher({
+      organization
+    });
+  } catch (e) {
+    res.statusCode = 400;
+    res.end(`Failed to fetch pull requests. Received: ${e}`);
+    return;
+  }
 
   console.log("Received Pull Requests. Generating e-mail.");
   const markdownBody = convertPullRequestsToMarkdown(
@@ -38,7 +50,12 @@ export default async function(req: IncomingMessage, res: ServerResponse) {
   );
   const htmlBody = marked(markdownBody);
 
-  await sendEmail({ to: to, textBody: markdownBody, htmlBody: htmlBody });
+  await sendEmail({
+    to: to,
+    textBody: markdownBody,
+    htmlBody: htmlBody,
+    emailer: emailer
+  });
 
   res.end(htmlBody);
 }
@@ -66,11 +83,14 @@ function convertPullRequestsToMarkdown(
 async function sendEmail({
   to,
   textBody,
-  htmlBody
+  htmlBody,
+  emailer
 }: {
   to: string[];
   textBody: string;
   htmlBody: string;
+  // @sengrid/mail did not export the `MailService` type, but that's what this should be
+  emailer: any;
 }) {
   if (!process.env.SENDGRID_API_KEY || to.length == 0) {
     console.log(
@@ -82,7 +102,7 @@ async function sendEmail({
 
   console.log("Sending email");
 
-  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+  emailer.setApiKey(process.env.SENDGRID_API_KEY);
 
   const email = {
     to: to,
@@ -92,7 +112,7 @@ async function sendEmail({
     html: htmlBody
   };
 
-  const emailResponse = await sgMail.send(email);
+  const emailResponse = await emailer.send(email);
 
   console.log(`Sent email. Response: `);
   console.log(emailResponse);
