@@ -83,7 +83,7 @@ test("emailing using a single `to` query parameter", async () => {
 
   expect(resp.statusCode).toBe(200);
   expect(mockEmailer.send).toHaveBeenCalledWith(
-    expect.objectContaining({ to: "email1@example.com" })
+    expect.objectContaining({ to: ["email1@example.com"] })
   );
 });
 
@@ -101,7 +101,9 @@ test("emailing using a multiple items in the `to` query parameter (separated by 
 
   expect(resp.statusCode).toBe(200);
   expect(mockEmailer.send).toHaveBeenCalledWith(
-    expect.objectContaining({ to: "email1@example.com,email2@example2.com" })
+    expect.objectContaining({
+      to: ["email1@example.com", "email2@example2.com"]
+    })
   );
 });
 
@@ -119,7 +121,9 @@ test("emailing using a multiple `to` query parameters", async () => {
 
   expect(resp.statusCode).toBe(200);
   expect(mockEmailer.send).toHaveBeenCalledWith(
-    expect.objectContaining({ to: "email1@example.com,email2@example2.com" })
+    expect.objectContaining({
+      to: ["email1@example.com", "email2@example2.com"]
+    })
   );
 });
 
