@@ -1,4 +1,7 @@
 {
+  "engines": {
+    "node": "~10"
+  },
   "scripts": {
     "dev": "now dev",
     "deploy": "now deploy",
