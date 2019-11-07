@@ -17,7 +17,7 @@
     "@types/test-listen": "^1.1.0",
     "jest": "^24.8.0",
     "node-mocks-http": "^1.7.5",
-    "now": "^15.3.0",
+    "now": "^16.0.0",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.7",
     "test-listen": "^1.1.0",
