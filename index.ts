@@ -35,9 +35,10 @@ export default async function(
   console.log("Requesting Pull Requests");
   let recentlyClosedPullRequests: IPullRequestsForRepos;
   try {
-    recentlyClosedPullRequests = await pullRequestFetcher({
-      organization
-    });
+    recentlyClosedPullRequests = await pullRequestFetcher(
+      { organization },
+      process.env.GITHUB_AUTH_TOKEN
+    );
   } catch (e) {
     res.statusCode = 400;
     res.end(`Failed to fetch pull requests. Received: ${e}`);
