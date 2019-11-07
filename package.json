@@ -27,6 +27,6 @@
   "dependencies": {
     "@sendgrid/mail": "^6.4.0",
     "marked": "~0.6.2",
-    "weekly-summary-typescript": "^0.1.1"
+    "weekly-summary-typescript": "^1.0.0"
   }
 }
